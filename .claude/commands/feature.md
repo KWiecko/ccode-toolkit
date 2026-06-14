@@ -14,6 +14,6 @@ Feature request: $ARGUMENTS
    Evidence > vote: a demonstrated fact outweighs opinions.
 5. On fail: hand the worker the review; it fixes the root cause and re-verifies. Cap at 3 rounds; if the same failures recur (oscillation), stop and escalate to the human.
 6. On accept: commit with a clear message.
-7. If this run changed any *means* (doctrine, dispatch heuristic, a prompt), append a decision line to `.claude/memory/decisions.jsonl`. Never edit `.claude/memory/reward/**`.
+7. If this run changed any *means* (a CLAUDE.md note, a dispatch heuristic, an agent prompt), append a decision line to `.claude/memory/decisions.jsonl`. Never edit `.claude/memory/reward/**`.
 
 Argument contract: reproducible evidence wins; honest hypotheses are free; rhetoric is penalized; fabricated evidence is penalized hardest.

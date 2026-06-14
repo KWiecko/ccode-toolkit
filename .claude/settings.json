@@ -1,5 +1,8 @@
 {
   "permissions": {
+    "allow": [
+      "Bash(adb devices)"
+    ],
     "deny": [
       "Edit(//**/.claude/memory/reward/**)",
       "Write(//**/.claude/memory/reward/**)"

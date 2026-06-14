@@ -18,7 +18,7 @@ LLMs do the heavy lifting; you are the **protein tester** — one voter in a div
 ## Layout
 
 ```
-CLAUDE.md                          operating doctrine (source of truth)
+CLAUDE.md                          framework notes (source of truth)
 .claude/
   settings.json                    permissions — reward/ is deny-listed
   commands/{feature,reflect}.md    the two rituals

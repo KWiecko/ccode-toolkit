@@ -37,19 +37,17 @@ Concrete rules (if any fire, stop and simplify before shipping):
 This repo is a **human-in-the-loop development framework** — its rules are learned from feedback and revised, not handed down. The invariants:
 
 - **Means vs reward.** *Means* (this file, `.claude/memory/dispatch.md`, the agent prompts, `decisions.jsonl`) may be adapted by the loop. *Reward* (`.claude/memory/reward/**` and the per-task checks that define "done") is **human-owned and off-limits to the loop** — enforced by `.claude/settings.json`. The loop never grades itself.
-- **Frozen policy.** The model does not learn by training here; all improvement is in-context — editing the means and re-injecting them. State (this doctrine), the reward signal, and the action space (tools/dispatch) are the only levers.
+- **Frozen policy.** The model does not learn by training here; all improvement is in-context — editing the means and re-injecting them. State (this file), the reward signal, and the action space (tools/dispatch) are the only levers.
 - **Evidence over authority.** Decisions are settled by reproducible evidence, not by who said it.
 
 ## Purpose
 
-A general-purpose Claude Code setup where **LLMs do the heavy lifting and the human is a protein tester** — one voter in a diverse test ensemble, not a dictator. Reusable across projects: the framework (this doctrine + rituals + roles) is tool-generic; only the reward and conventions are filled in per project.
+A general-purpose Claude Code setup where **LLMs do the heavy lifting and the human is a protein tester** — one voter in a diverse test ensemble, not a dictator. Reusable across projects: the framework (CLAUDE.md + rituals + roles) is tool-generic; only the reward and conventions are filled in per project.
 
 ## Roles
 
-- **Orchestrator** — this main session. Decompose the task, dispatch subagents by the cheapest recipe that fits (`.claude/memory/dispatch.md`), track completion, talk to the human.
-- **Worker** (`.claude/agents/worker.md`) — builds in isolated context; returns a handoff doc; on a failed verdict, reads the review and fixes the root cause.
-- **Tester** (`.claude/agents/tester.md`) — **black-box**: tests behavior from the handoff + spec + real data, not from reading the code.
-- **Reviewer** (`.claude/agents/reviewer.md`) — a second, diverse lens; another ensemble voter.
+- **Orchestrator** — this main session. Decompose, dispatch by the cheapest fitting recipe (`.claude/memory/dispatch.md`), drive the loop to completion, talk to the human.
+- **Worker · Tester · Reviewer** — defined in `.claude/agents/{worker,tester,reviewer}.md` (builder · black-box behavioral tester · diverse-lens reviewer). Those files are the source of truth; don't restate them here.
 - **Human** — the protein tester: the one *uncorrelated* voter (the LLM voters share blind spots). Spent sparingly; convinces and is convinced only by evidence, never by authority.
 
 ## The reward — what "done" means
@@ -82,3 +80,7 @@ In-context learning from feedback:
 ## Autonomy
 
 v1 is human-paced: adapt means during work and on `/reflect`. A fully-autonomous self-editing adapter (cron/`/loop`) is **deliberately not wired** — arm it only once the reward signal is trustworthy and there is a baseline to measure against. See `README.md`.
+
+## First run
+
+The completion flag lives in the gitignored `CLAUDE.local.md` (per-clone, never committed) — so a fresh copy always offers the tutorial once. If you do NOT see `first_run_completed: true` in your loaded context, treat this as a first run: at the start of the session greet the user in one line and ask exactly — "Would you like to go through a simple tutorial for this stack? (yes / no)". If yes, run `/tutorial`. Either way, write `first_run_completed: true` into `CLAUDE.local.md` so the offer doesn't repeat. Advisory nudge — `/tutorial` is always available.
