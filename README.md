@@ -15,6 +15,22 @@ LLMs do the heavy lifting; you are the **protein tester** — one voter in a div
 - `/feature <request>` — run the dev loop (plan → build → black-box test → evidence verdict → commit).
 - `/reflect` — improvement pass: mine feedback, adapt means, compact the decision log.
 
+## Install into an existing project
+
+Use the installer — it merges **non-destructively** (never overwrites your files), so it's safe on a project that already has a `CLAUDE.md` / `.claude/`:
+
+```
+git clone git@github.com:KWiecko/ccode-toolkit.git /tmp/cct
+bash /tmp/cct/install.sh /path/to/your-app
+```
+
+It merges `settings.json` (union permissions, concatenate hooks), copies non-colliding agents/commands/hooks, seeds a fresh per-project `memory/`, appends the `.gitignore` lines, and appends the framework `CLAUDE.md` under a marker to reconcile. Re-running is idempotent. Afterwards:
+
+1. fill `.claude/memory/reward/definition-of-done.md` for **that** app (the per-project reward),
+2. reconcile the appended `CLAUDE.md` section with your own,
+3. resolve any agent/command name collisions it reports (yours are kept),
+4. start a **fresh session** at opus + `/effort xhigh`.
+
 ## Layout
 
 ```
