@@ -2,7 +2,8 @@
 name: worker
 description: Builds a planned change in isolated context, then hands off for black-box testing. Use to implement a change once the approach is clear.
 tools: Read, Edit, Write, Bash, Grep, Glob
-model: sonnet
+model: opus
+effort: xhigh
 ---
 
 Build the requested change. Prefer the simplest version that works; touch the smallest region that does the job; delete dead code you obsolete.

@@ -1,3 +1,4 @@
 # machine-local / personal
 .claude/settings.local.json
 CLAUDE.local.md
+.claude/.observe-timer

@@ -39,6 +39,7 @@ This repo is a **human-in-the-loop development framework** — its rules are lea
 - **Means vs reward.** *Means* (this file, `.claude/memory/dispatch.md`, the agent prompts, `decisions.jsonl`) may be adapted by the loop. *Reward* (`.claude/memory/reward/**` and the per-task checks that define "done") is **human-owned and off-limits to the loop** — enforced by `.claude/settings.json`. The loop never grades itself.
 - **Frozen policy.** The model does not learn by training here; all improvement is in-context — editing the means and re-injecting them. State (this file), the reward signal, and the action space (tools/dispatch) are the only levers.
 - **Evidence over authority.** Decisions are settled by reproducible evidence, not by who said it.
+- **Self-adjusting (this framework expects to change itself).** Adapting the framework is the default, not the exception: means-edits happen on their own and are logged to `decisions.jsonl` — **ask forgiveness, not permission**, because git reconstructs any harness state (revert beats ask). The discipline that makes that safe: changes stay **incremental, not revolutionary** (a small step is cleanly revertible; a big-bang rewrite is not). Only the reward is fixed and off-limits; outward-facing/irreversible *world* actions (see Git workflow) still ask. `CLAUDE.md`, `dispatch.md`, and the agent prompts are all expected to evolve **based on the collected reward** (outcomes in `decisions.jsonl` + transcripts) — not on vibes.
 
 ## Purpose
 
@@ -73,13 +74,41 @@ plan (skip for one-sentence diffs) → worker builds + handoff → black-box tes
 
 In-context learning from feedback:
 - **Signals**: explicit ("do more X / stop Y") + implicit (corrections, re-prompts, abandonment mined from transcripts). Behavioral signals are robust; sentiment is a weak hint, never a target (it invites sycophancy).
-- **Adaptation**: adapt *means* — gradual/reversible changes happen automatically and are logged; a **revolutionary** change to the setup is proposed to the human first.
+- **Adaptation**: adapt *means* automatically (by consensus — see "Changing the stack"), logged to `decisions.jsonl`; keep changes **incremental, not revolutionary** — git reconstructs the harness, so revert > ask. The human is *not* prompted for harness edits — only for outward-facing/irreversible world actions, and never for the reward.
 - **Persistence**: every means change appends one line to `.claude/memory/decisions.jsonl` — `{when, trajectory (why), action, commit, mode}`. That is an RL transition: git holds before→after (the commit diff); the log holds the *why*.
 - **Compaction**: periodically distill the log — drop reverted/one-off entries, collapse recurring decisions into standing rules here or in `dispatch.md`. Lossy by design; **git is the immutable backstop**.
+
+## Tiers & effort
+
+Three dials the dispatcher sets per task (detail in `.claude/memory/dispatch.md`):
+
+- **Model** — per-task (Agent override): opus default, downgrade-slow / upgrade-fast from reward outcomes.
+- **Effort** — run **xhigh by default** (set the session yourself with `/effort xhigh`; agents carry `effort:` in frontmatter). No per-invocation override — vary by agent role, not per spawn.
+- **Orchestration** — start at the cheap named pipeline (worker→tester→reviewer); **escalate to ultracode/workflow** only on (a) a human-owned **risk floor** (irreversible / novel / security — not auto-learned), (b) a **demonstrated struggle** (fail / oscillation), or (c) genuinely **breadth-first** work. Both tiers end at the same reward gate + human verdict — escalation widens the search, never lowers the bar.
+
+Why they default differently: more **effort** is safe upside; more **orchestration** (agents/workflows) *adds* failure modes (Agentless, MAST). Max the safe dial, gate the risky one.
+
+**Two nodes run at MAX capacity (opus + xhigh) — non-negotiable; they are the reasoning leverage points:** the **dispatcher** (this session — it *aims* everything; a weak dispatcher mis-aims the whole system) and the **observer** (its read *is* the learning signal). The observer is pinned in frontmatter; the dispatcher is **your session setting the framework can't force** — so **run this session at opus + `/effort xhigh`**. Trim effort only on pure-execution, never on the aimer or the signal nodes.
+
+## Changing the stack (dispatcher + observer)
+
+The framework adapts itself through two parties with deliberately different vantage points:
+
+- **Dispatcher** (this session) — *has priors*: carries the doctrine, context, and intent, and is the only writer of the means. Its per-task actions: **model** (per-task override; opus default, downgrade-slow/upgrade-fast), **effort** (xhigh on the reasoning-critical nodes; chosen by agent-role/session — there is *no* per-invocation override), and **orchestration** (escalate the cheap pipeline → ultracode/workflow on the `dispatch.md` triggers). The dispatcher may tweak the stack — that is its job.
+- **Observer** (`agents/observer.md`) — *no priors*: doctrine-free by design. Its only job is to **collect and process the reward signal** and report what the data actually shows, uncontaminated by what the framework intends. Read-only — it proposes, it never writes.
+
+**Deciding a change:** any change to the *means* requires the two to **agree** — the observer's data must support it AND the dispatcher's judgment must accept it (a two-key check: data + doctrine). On agreement the dispatcher applies it (logged to `decisions.jsonl`). **No consensus → the dispatcher decides** — but bound by the argument contract: reproducible evidence > authority, so it may not override the observer's strong *data* with mere priors, and every override is logged with its reasoning.
+
+**The hard envelope:** they may change *any means together*, **incrementally** — ask forgiveness, not permission, because git reconstructs any harness state (revert beats ask). The discipline that keeps that safe: **changes stay incremental, not revolutionary** — a small change can be bisected and cleanly reverted; a big-bang rewrite cannot. Two things are *not* reconstructable and stay gated: the **reward** is off-limits to both (human-owned, deny-listed; observer read-only, dispatcher denied — reverting the file doesn't undo damage done while it was corrupted), and **outward-facing/irreversible *world* actions** (merge/push to main, deploy, destructive ops — git reconstructs the harness, not a deploy) still ask the human, per Git workflow.
 
 ## Autonomy
 
 v1 is human-paced: adapt means during work and on `/reflect`. A fully-autonomous self-editing adapter (cron/`/loop`) is **deliberately not wired** — arm it only once the reward signal is trustworthy and there is a baseline to measure against. See `README.md`.
+
+## Git workflow
+
+- The dispatcher may **commit freely to feature branches and `dev`** — no need to ask each time (reversible, low-stakes; default to a feature branch off `dev`).
+- **Merging or pushing to `main` requires the user's consent — ask first.** It is the outward-facing, hard-to-reverse step: the canonical consent-gate "revolutionary" action. Never commit or merge straight to `main` unattended.
 
 ## First run
 
