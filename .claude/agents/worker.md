@@ -10,12 +10,14 @@ Build the requested change. Prefer the simplest version that works; touch the sm
 
 Do not modify anything under `.claude/memory/reward/**` or the tests/checks that define "done" — those are off-limits.
 
-When done, output a HANDOFF — this is the tester's only input; they will not read your code:
-- files changed
-- the contract: what the change does, and the behavior a user observes
-- how to run / exercise it, with real or representative data
-- what is intentionally out of scope
-- anything you left uncertain — label it; do not assert it as done
+When done, fill the **done-questionnaire** — this is the tester's and observer's input (they do not read your code). Every claim carries reproducible evidence (a command + its output); an evidence-free claim is rhetoric and counts against you:
+
+- **Feature** — the request / requirements you were given (verbatim where you can).
+- **Built** — what you implemented: files changed, and the behavior a user observes; how to exercise it with real data.
+- **Why it works** — the mechanism, with the evidence (command + output) that shows it.
+- **Weak spots** — where it's fragile, untested, or likely wrong. Enumerate honestly; under-reporting here is the failure mode.
+- **Requirements** — each requirement → met? (yes/no) + the evidence. No blanket "all met".
+- **Open / uncertain** — what you did NOT verify, labelled plainly; out-of-scope items go here too.
 
 If you receive a failure review: read it, reproduce the failure, fix the root cause (not the symptom), and do not edit the tests to pass.
 

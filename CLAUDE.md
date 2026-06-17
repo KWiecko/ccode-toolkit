@@ -48,12 +48,12 @@ A general-purpose Claude Code setup where **LLMs do the heavy lifting and the hu
 ## Roles
 
 - **Orchestrator** — this main session. Decompose, dispatch by the cheapest fitting recipe (`.claude/memory/dispatch.md`), drive the loop to completion, talk to the human.
-- **Worker · Tester · Reviewer** — defined in `.claude/agents/{worker,tester,reviewer}.md` (builder · black-box behavioral tester · diverse-lens reviewer). Those files are the source of truth; don't restate them here.
+- **Worker · Tester · Reviewer · Observer** — defined in `.claude/agents/{worker,tester,reviewer,observer}.md` (builder · black-box behavioral tester · diverse-lens reviewer · no-priors reward-scorer). Those files are the source of truth; don't restate them here.
 - **Human** — the protein tester: the one *uncorrelated* voter (the LLM voters share blind spots). Spent sparingly; convinces and is convinced only by evidence, never by authority.
 
 ## The reward — what "done" means
 
-Real-data, black-box, behavioral: a check must exercise how the software is actually *used*, not how the implementation imagines it. **"Tests green" is necessary, never sufficient.** Evidence must be **reproducible by the human**. The shape lives in `.claude/memory/reward/definition-of-done.md`; concrete per-task criteria live in that task's spec. Agents must not edit the reward — if it seems wrong, raise it with the human.
+Real-data, black-box, behavioral: a check must exercise how the software is actually *used*, not how the implementation imagines it. **"Tests green" is necessary, never sufficient.** Evidence must be **reproducible by the human**. The shape lives in `.claude/memory/reward/definition-of-done.md`; concrete per-task criteria live in that task's spec. Agents must not edit the reward — if it seems wrong, raise it with the human. The work is **scored by the observer** (no priors, from the evidence against this definition), never by the dispatcher or worker that produced it (**aimer ≠ scorer**); the observer *prepares* the assessment, but reproducible evidence + the human's vote *decide*.
 
 ## The argument contract
 
@@ -68,7 +68,7 @@ No role-play, no personas — direct functional prompts and claims only.
 
 ## The loop — `/feature`
 
-plan (skip for one-sentence diffs) → worker builds + handoff → black-box tester + reviewer + human vote on reproducible evidence → on fail, worker reads the review and iterates (cap 3 rounds; on oscillation, escalate to the human) → on accept, commit.
+plan (skip one-sentence diffs) → worker builds + fills the **done-questionnaire** → tester (real-data evidence) + reviewer (answers it **blind**) → **observer scores** (the worker↔reviewer **delta-digest** + an evidence-grounded assessment — it prepares, doesn't decide) → dispatcher + human decide on reproducible evidence (big delta → iterate the contested items; small delta ≠ done — agreement isn't evidence) → on fail, carry the delta forward and iterate (cap 3; oscillation → escalate) → on accept, commit.
 
 ## Improvement — `/reflect`
 
