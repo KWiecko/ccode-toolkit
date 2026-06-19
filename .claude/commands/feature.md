@@ -5,7 +5,7 @@ description: Run the human-in-the-loop development loop — plan, build, questio
 Feature request: $ARGUMENTS
 
 1. Clarify intent. If the request is ambiguous in a way that changes the result, ask (AskUserQuestion) first. Propose the success criteria; the human owns them.
-2. Plan briefly — skip if the diff is one sentence; for multi-file or unfamiliar work, write a short plan.
+2. **Real-usage first** (before building, per Directive 3): understand how the change will actually be used and pin the **real-usage check** that defines done — real data / real entry points, reproducible by the human. This is the per-task reward; the human owns it; the worker builds *toward* it, never authors it to fit the code. Scale to the task (a one-sentence diff's usage is obvious; a feature earns a real-usage harness). Plan briefly here if multi-file or unfamiliar.
 3. Dispatch the worker (cheapest recipe that fits — `.claude/memory/dispatch.md`). It builds and fills the **done-questionnaire** (see worker.md), every claim backed by reproducible evidence.
 4. Verify as a diverse ensemble:
    - **tester** — black-box, real data → reproducible **evidence**;

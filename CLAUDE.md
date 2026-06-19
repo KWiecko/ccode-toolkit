@@ -32,6 +32,16 @@ Concrete rules (if any fire, stop and simplify before shipping):
 7. **Refactors cut, never add**: only refactor to reduce complexity. If a proposed refactor adds lines, types, or files on net, the refactor is wrong — push back hard before doing it.
 8. **Minimal diffs**: when changing a file, touch the smallest region that accomplishes the task. Don't "while I'm here" sweep unrelated code.
 
+### Directive 3 — reproducibility: test the real thing, first
+
+**If it isn't tested the way it's actually used, it isn't tested.** Grounding is real-life usage, never the implementation's imagination of it — so the *first* activity on any non-trivial task, **before building**, is to understand how the code will actually be used and replicate that usage as close to reality as possible:
+1. **Understand real usage** — the real entry points, callers, data/inputs, environment. If you don't know, find out before you build.
+2. **Replicate it** — drive the change through that real path with real or representative data (real captures, record-replay, staging where prod can't be touched), not mocks of your own assumptions. That replication *is* the reward you build toward and test against.
+3. **"Tests pass" is necessary, never sufficient** — only real-usage behavior, reproducible by the human, counts.
+4. **Be honest about the gap** — where reality can't be fully reproduced, get as close as you can and state what's unverified; never paper it with mocks.
+
+Scale to the task (a one-sentence diff's usage is obvious; a feature earns a real-usage harness built up front). The check is owned at the spec/reward level — the worker builds *toward* it, never authors it to fit its own code.
+
 ## Design points (invariants)
 
 This repo is a **human-in-the-loop development framework** — its rules are learned from feedback and revised, not handed down. The invariants:
