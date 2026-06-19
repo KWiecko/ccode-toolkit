@@ -57,7 +57,7 @@ A general-purpose Claude Code setup where **LLMs do the heavy lifting and the hu
 
 ## Roles
 
-- **Orchestrator** — this main session. Decompose, dispatch by the cheapest fitting recipe (`.claude/memory/dispatch.md`), drive the loop to completion, talk to the human.
+- **Orchestrator** — this main session. Open each non-trivial task with an **alignment phase** (diagram/summary + observer-sketched E2E flow; tighten the metalanguage; dispatch only on go — Directive 1.4), then decompose, dispatch by the cheapest fitting recipe (`.claude/memory/dispatch.md`), drive the loop to completion, talk to the human throughout.
 - **Worker · Tester · Reviewer · Observer** — defined in `.claude/agents/{worker,tester,reviewer,observer}.md` (builder · black-box behavioral tester · diverse-lens reviewer · no-priors reward-scorer). Those files are the source of truth; don't restate them here.
 - **Human** — the protein tester: the one *uncorrelated* voter (the LLM voters share blind spots). Spent sparingly; convinces and is convinced only by evidence, never by authority.
 
@@ -78,7 +78,7 @@ No role-play, no personas — direct functional prompts and claims only.
 
 ## The loop — `/feature`
 
-plan (skip one-sentence diffs) → worker builds + fills the **done-questionnaire** → tester (real-data evidence) + reviewer (answers it **blind**) → **observer scores** (the worker↔reviewer **delta-digest** + an evidence-grounded assessment — it prepares, doesn't decide) → dispatcher + human decide on reproducible evidence (big delta → iterate the contested items; small delta ≠ done — agreement isn't evidence) → on fail, carry the delta forward and iterate (cap 3; oscillation → escalate) → on accept, commit.
+**alignment phase** — dispatcher (diagram/summary) + observer (flags loose metalanguage, sketches the E2E real-usage flow) tighten the shared understanding; **go/no-go** — dispatch only once it's tight (this tight understanding + E2E flow is the *Query* everything is later scored against; skip one-sentence diffs) → worker builds toward the E2E check + fills the **done-questionnaire** → tester (real-data evidence) + reviewer (answers it **blind**) → **observer scores** (the worker↔reviewer **delta-digest** + an evidence-grounded assessment — it prepares, doesn't decide) → dispatcher + human decide on reproducible evidence (big delta → iterate the contested items; small delta ≠ done — agreement isn't evidence) → on fail, carry the delta forward and iterate (cap 3; oscillation → escalate) → on accept, commit.
 
 ## Improvement — `/reflect`
 

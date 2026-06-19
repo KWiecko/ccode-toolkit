@@ -1,23 +1,26 @@
 ---
-description: Run the human-in-the-loop development loop — plan, build, questionnaire, evidence + delta verdict, commit.
+description: Run the human-in-the-loop development loop — align, build, questionnaire, evidence + delta verdict, commit.
 ---
 
 Feature request: $ARGUMENTS
 
-1. Clarify intent. If the request is ambiguous in a way that changes the result, ask (AskUserQuestion) first. Propose the success criteria; the human owns them.
-2. **Real-usage first** (before building, per Directive 3): understand how the change will actually be used and pin the **real-usage check** that defines done — real data / real entry points, reproducible by the human. This is the per-task reward; the human owns it; the worker builds *toward* it, never authors it to fit the code. Scale to the task (a one-sentence diff's usage is obvious; a feature earns a real-usage harness). Plan briefly here if multi-file or unfamiliar.
-3. Dispatch the worker (cheapest recipe that fits — `.claude/memory/dispatch.md`). It builds and fills the **done-questionnaire** (see worker.md), every claim backed by reproducible evidence.
-4. Verify as a diverse ensemble:
-   - **tester** — black-box, real data → reproducible **evidence**;
+1. **Alignment phase — tighten the metalanguage before dispatching (dispatcher-led, observer-assisted).** Not a literal negotiation; the point is to make the shared understanding *tight* at every level, so there's nothing ambiguous to diverge on later.
+   a. **Dispatcher** presents the anticipated work as a **diagram + short summary** (Directive 1.4): scope, the terms/vocabulary, what "done" means.
+   b. **Observer assists** (no priors, read-only): flags where the metalanguage is still loose or ambiguous, and **sketches the E2E real-usage test flow** (Directive 3 — how the change will actually be used and checked). That sketch becomes the per-task check the worker builds toward and the observer later scores against. It proposes; it does not decide.
+   c. **Go / no-go:** dispatch only once the metalanguage is tight AND the E2E real-usage flow is sketched. If still loose, keep tightening or ask the human on genuine forks (AskUserQuestion). Scale to the task — a one-sentence diff skips this.
+   The agreed, tight understanding + E2E flow is the **Query** everything downstream is scored against; the human owns "done".
+2. Dispatch the worker (cheapest recipe that fits — `.claude/memory/dispatch.md`). It builds *toward* the E2E real-usage check and fills the **done-questionnaire** (see worker.md), every claim backed by reproducible evidence.
+3. Verify as a diverse ensemble:
+   - **tester** — runs the E2E flow black-box on real data → reproducible **evidence**;
    - **reviewer** — answers the *same* questionnaire **blind** (dispatch it without the worker's answers, so it doesn't anchor);
-   - **observer** — scores: the worker↔reviewer **delta-digest** (divergences + agreed-open-risks + evidence pointers) + an evidence-grounded assessment. It *prepares*; it does not decide (aimer ≠ scorer).
+   - **observer** — scores against the Query: the worker↔reviewer **delta-digest** (divergences + agreed-open-risks + evidence pointers) + an evidence-grounded assessment. It *prepares*; it does not decide (aimer ≠ scorer).
    - **human** — the uncorrelated voter, brought in for the verdict, sparingly.
-5. Decide on the digest + REPRODUCIBLE evidence (evidence > vote):
+4. Decide on the digest + REPRODUCIBLE evidence (evidence > vote):
    - **big delta** → not done; iterate the *contested* items.
    - **small delta** → still require the tester's evidence + a human vote — **agreement is not evidence**; treat too-easy agreement on something novel as a reason to verify harder, not to pass.
-6. On fail: carry the delta-digest forward so the worker focuses the disputed items. Cap 3 rounds; on oscillation (the same divergences recur), stop and escalate to the human with the digest.
-7. On accept: commit.
-8. If this run changed any *means* (a CLAUDE.md note, a dispatch heuristic, an agent prompt), append a decision to `.claude/memory/decisions.jsonl`. Never edit `.claude/memory/reward/**`.
+5. On fail: carry the delta-digest forward so the worker focuses the disputed items. Cap 3 rounds; on oscillation (the same divergences recur), stop and escalate to the human with the digest.
+6. On accept: commit.
+7. If this run changed any *means* (a CLAUDE.md note, a dispatch heuristic, an agent prompt), append a decision to `.claude/memory/decisions.jsonl`. Never edit `.claude/memory/reward/**`.
 
 Argument contract: reproducible evidence wins; honest hypotheses are free; rhetoric is penalized; fabricated evidence is penalized hardest.
 
