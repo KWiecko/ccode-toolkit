@@ -94,7 +94,7 @@ Three dials the dispatcher sets per task (detail in `.claude/memory/dispatch.md`
 
 - **Model** — per-task (Agent override): opus default, downgrade-slow / upgrade-fast from reward outcomes.
 - **Effort** — run **xhigh by default** (set the session yourself with `/effort xhigh`; agents carry `effort:` in frontmatter). No per-invocation override — vary by agent role, not per spawn.
-- **Orchestration** — start at the cheap named pipeline (worker→tester→reviewer); **escalate to ultracode/workflow** only on (a) a human-owned **risk floor** (irreversible / novel / security — not auto-learned), (b) a **demonstrated struggle** (fail / oscillation), or (c) genuinely **breadth-first** work. Both tiers end at the same reward gate + human verdict — escalation widens the search, never lowers the bar.
+- **Orchestration** — start at the cheap named pipeline (worker→tester→reviewer); **escalate to ultracode/workflow** only on (a) a human-owned **risk floor** (irreversible / novel / security — not auto-learned), (b) a **demonstrated struggle** (fail / oscillation), or (c) genuinely **breadth-first** work. Both tiers end at the same reward gate + human verdict — escalation widens the search, never lowers the bar. **Parallelize by structure, not size:** reads/review fan out freely (run tester+reviewer in parallel), writes only on disjoint write-sets; throughput caps the *width*, never the *whether* — detail in `dispatch.md`.
 
 Why they default differently: more **effort** is safe upside; more **orchestration** (agents/workflows) *adds* failure modes (Agentless, MAST). Max the safe dial, gate the risky one.
 

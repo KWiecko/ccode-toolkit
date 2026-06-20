@@ -10,7 +10,7 @@ Feature request: $ARGUMENTS
    c. **Go / no-go:** dispatch only once the metalanguage is tight AND the E2E real-usage flow is sketched. If still loose, keep tightening or ask the human on genuine forks (AskUserQuestion). Scale to the task — a one-sentence diff skips this.
    The agreed, tight understanding + E2E flow is the **Query** everything downstream is scored against; the human owns "done".
 2. Dispatch the worker (cheapest recipe that fits — `.claude/memory/dispatch.md`). It builds *toward* the E2E real-usage check and fills the **done-questionnaire** (see worker.md), every claim backed by reproducible evidence.
-3. Verify as a diverse ensemble:
+3. Verify as a diverse ensemble (tester + reviewer run in **parallel** — both read-only, independent votes):
    - **tester** — runs the E2E flow black-box on real data → reproducible **evidence**;
    - **reviewer** — answers the *same* questionnaire **blind** (dispatch it without the worker's answers, so it doesn't anchor);
    - **observer** — scores against the Query: the worker↔reviewer **delta-digest** (divergences + agreed-open-risks + evidence pointers) + an evidence-grounded assessment. It *prepares*; it does not decide (aimer ≠ scorer).

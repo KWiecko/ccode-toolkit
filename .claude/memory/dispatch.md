@@ -34,6 +34,27 @@ Run **xhigh by default** — deeper reasoning is mostly safe upside. Set the ses
 
 Note: effort has **no per-invocation override** — vary it by agent role or session, not per spawn (unlike model tier, which the dispatcher overrides per task).
 
+## Parallelization — structure decides *whether*, throughput decides *how much*
+
+Never gate on a token estimate: it's ~30x noisy on the same task and systematically low (arXiv 2604.22750), and latency follows the **critical path**, not the token sum (LAMaS). The rule is **fan out reads, serialize writes.**
+
+**WHETHER (task structure):**
+- **Default serial for coding writes** — coding is a poor multi-agent fit; parallelism is a ~15x-token bet that pays only on breadth.
+- **Parallelize reads freely** — research, code-understanding, review, audit, testing are read-only → no conflicting decisions. *Free win:* run the **tester and reviewer in parallel** on the worker's handoff (independent read-only votes, aggregated at the reward gate).
+- **Parallelize writes only when** units have: (a) **disjoint write-sets** — enumerate the files/dirs each branch writes; if they intersect, serial; (b) **no result-dependency edge** (no "A makes a util B imports"); (c) **no shared mutable resource** (DB/port/cache — worktrees isolate files only); (d) **no improvised shared convention** — two writers making conflicting design choices in *different* files merge **clean** and ship **silently broken** (the failure git can't catch). If you can't list each unit's files up front, you don't understand it yet — plan first.
+- **Engineer independence:** if units share a contract/interface, scaffold + commit it **serially first**, then fan out the consumers (highest-leverage move). Parallelize **wide-and-shallow** graphs; never a **deep chain**.
+
+**HOW-MUCH (throughput — only after structure allows it):**
+- width = min(16 workflow cap, OTPM-remaining ÷ per-agent, RPM-remaining). **Opus OTPM is the binding seat** → route parallel **width to sonnet/haiku**, keep opus for the dispatcher + synthesis; lean on prompt caching (cache_read is ~free against ITPM).
+- Cap **writers at 2–4** (more only for pure independent-unit fan-out); stagger spawns (burst → 429).
+- **Estimate-cheap, measure-live, cap-hard:** probe one slice for real tokens/unit → meter live (`/workflows`, `/usage`, rate-limit headers) → set width → hard token/$ cap. A measured slice beats any forecast.
+
+**Mechanism ladder (cheapest/safest first — all native; don't bolt on LangGraph/CrewAI):** parallel read/research subagents → `claude -p` headless fan-out (mechanical per-file, capped) → worktree-per-unit or `/batch` (independent feature units) → agent-teams with a shared task-list lock-and-claim (off by default; only >2 writers). Each writer gets `isolation: worktree`.
+
+**Integration is where parallel work fails — make it a single-threaded reduce:** merge **sequentially** (not all-at-once), **never auto-merge**, and run the **behavioral reward check even after a clean merge**. Per-branch green is necessary, never sufficient.
+
+**Voting-by-competition** (hard/low-confidence task with a real reward): run N parallel worker attempts in separate worktrees, pick the winner at the reward gate.
+
 ## Task type → recipe
 
 - one-sentence diff / typo / rename → main loop does it directly; no subagents.
