@@ -4,7 +4,7 @@ description: Run the human-in-the-loop development loop — align, build, questi
 
 Feature request: $ARGUMENTS
 
-1. **Alignment phase — tighten the metalanguage before dispatching (dispatcher-led, observer-assisted).** Not a literal negotiation; the point is to make the shared understanding *tight* at every level, so there's nothing ambiguous to diverge on later.
+1. **Alignment phase — tighten the metalanguage before dispatching (dispatcher-led, observer-assisted).** Not a literal negotiation; the point is to make the shared understanding *tight* at every level, so there's nothing ambiguous to diverge on later. *(If the premise is shaky or leans on existing/unfamiliar code, run `/sanity-check` first — read-only request-vs-reality — and fold its findings into this alignment.)*
    a. **Dispatcher** presents the anticipated work as a **diagram + short summary** (Directive 1.4): scope, the terms/vocabulary, what "done" means.
    b. **Observer assists** (no priors, read-only): flags where the metalanguage is still loose or ambiguous, and **sketches the E2E real-usage test flow** (Directive 3 — how the change will actually be used and checked). That sketch becomes the per-task check the worker builds toward and the observer later scores against. It proposes; it does not decide.
    c. **Go / no-go:** dispatch only once the metalanguage is tight AND the E2E real-usage flow is sketched. If still loose, keep tightening or ask the human on genuine forks (AskUserQuestion). Scale to the task — a one-sentence diff skips this.
