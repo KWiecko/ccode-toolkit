@@ -28,7 +28,7 @@ Why cheap-by-default: more orchestration *adds* failure modes and cost (Agentles
 
 ## Effort
 
-Run **xhigh by default** — deeper reasoning is mostly safe upside. Set the session with `/effort xhigh` (the framework can't force it); agents carry `effort:` in frontmatter.
+Run **xhigh by default** — deeper reasoning is mostly safe upside. Pinned via `settings.json` (`effortLevel: xhigh`); agents carry `effort:` in frontmatter.
 
 **Max effort on signal-PRODUCERS — never trim it there.** The observer (its read *is* the meta-reward), the tester and reviewer (their verdicts *are* the reward signal) all run **xhigh**: a cheap mis-read corrupts the learning loop, the worst place to economize. Only trim effort on pure-*execution* work where a mistake is caught by the gate, not propagated as a corrupted signal.
 
