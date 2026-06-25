@@ -78,6 +78,8 @@ A TUI's real behaviour is **frame-level**; widget/object-state assertions (e.g. 
 
 State-green / pilot-green is necessary, **never** sufficient — this project has repeatedly shipped TUI bugs (desync, head-vs-tail, wrap-as-slider, tabs-not-switching) that passed object-state checks and were caught only by a human running it. The human-simulated PTY+rendered-frame test is the standing requirement; build the harness once and reuse it. (Enforced as the "Real-usage test" done-questionnaire item; the observer keeps a compliance question on it because the user raises it repeatedly.)
 
+**The harness must be HERMETIC for global side-effects — not just state.** Driving the *real* binary means its *real* side-effects fire. Isolate `HOME`/config/state (tmp dir) AND **suppress the binary's GLOBAL side-effects**: desktop notifications (`--no-notify`), audio/TTS (no `--speak`), and any network/world action — these are NOT contained by a tmp `HOME`. A test that skips this **pollutes the user's real environment** (observed: the PTY test spammed real `notify-send` "heard: go to the bathroom" onto the user's desktop; an early probe also wrote `/tmp/...` sessions into the real `state.json`). Run the binary deaf, mute, and notification-silent; assert only on the captured frame.
+
 ## Escalate on oscillation — change the primitive, not the parameter
 
 When a fix is hand-tuning a heuristic **parameter** (threshold/window/timeout/retry/sensitivity) and **≥2 rounds fail with the same failure mode**, STOP: treat non-convergence as a **wrong-primitive** signal, run the Directive-1.7 prior-art scan for a robust replacement, and escalate to `/feature` — don't keep patching the constant. The 2nd identical failure is the signal to switch the primitive, not tune it.
