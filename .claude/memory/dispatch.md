@@ -67,9 +67,16 @@ Never gate on a token estimate: it's ~30x noisy on the same task and systematica
 
 All non-trivial tasks go through the dispatched loop (worker → tester **∥** reviewer → observer), not inline dispatcher hand-coding; even small bugfixes get worker+tester. Keep **tester and reviewer DECORRELATED — never collapse to one** for TUI/terminal, failure-mode/concurrency, and long-running/stateful work: the blind code-reading reviewer reliably catches reproduced blockers the black-box happy-path tester *passes* (those bugs only surface under a fault / race / render / past-a-limit). Inline-coding skips the reviewer — exactly when blockers ship. Truly trivial one-line/mechanical edits may be inline, but **log them**.
 
-## Real-life test for TUI/CLI (and human-perceived surfaces)
+## Real-life test for TUI/CLI (and human-perceived surfaces) — MANDATORY
 
-A TUI's real behaviour is **frame-level**; widget/object-state assertions are blind to rendering, cropping, wrap, scroll, and over-time state. Satisfy the reward's "human-reproducible" bar for terminal/UI/audio work by (1) driving the **real binary at a real terminal (PTY, realistic size)** and asserting on the **rendered output**, and (2) a **mandatory human live smoke** before "done." State-green / pilot-green is necessary, never sufficient. (Enforced as the worker/reviewer "Real-usage test" done-questionnaire item.)
+A TUI's real behaviour is **frame-level**; widget/object-state assertions (e.g. a framework's `run_test()` Pilot reading `.active`/`.lines`) are **blind** to rendering, cropping, wrap, scroll, and over-time state. **You MUST always (when at all possible) build and run a HUMAN-SIMULATED test env**, not a state-check:
+
+1. **Drive the real binary** in a real **PTY** at a realistic terminal size (not the object API).
+2. **Prompt/inject real input** the way the user would (add a small test-only input seam — a fifo / stdin / `--inject` flag — if the live loop is driven by a device like a mic so it can't otherwise be fed).
+3. **Capture and assert on the RENDERED SCREEN with an external terminal emulator** — `pyte` (Python, no sudo: feed it the PTY bytes, read `screen.display`), or `tmux capture-pane -p`, or `script`. Assert what is *visibly* on screen (the tab switched and is highlighted, the newest line shows, text wrapped not truncated).
+4. Then a **human live smoke** before "done."
+
+State-green / pilot-green is necessary, **never** sufficient — this project has repeatedly shipped TUI bugs (desync, head-vs-tail, wrap-as-slider, tabs-not-switching) that passed object-state checks and were caught only by a human running it. The human-simulated PTY+rendered-frame test is the standing requirement; build the harness once and reuse it. (Enforced as the "Real-usage test" done-questionnaire item; the observer keeps a compliance question on it because the user raises it repeatedly.)
 
 ## Escalate on oscillation — change the primitive, not the parameter
 

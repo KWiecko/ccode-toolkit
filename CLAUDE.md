@@ -89,6 +89,10 @@ In-context learning from feedback:
 - **Persistence**: every means change appends one line to `.claude/memory/decisions.jsonl` — `{when, trajectory (why), action, commit, mode}`. That is an RL transition: git holds before→after (the commit diff); the log holds the *why*.
 - **Compaction**: periodically distill the log — drop reverted/one-off entries, collapse recurring decisions into standing rules here or in `dispatch.md`. Lossy by design; **git is the immutable backstop**.
 
+## Watchdog — self-check on cadence (you are your own watchdog)
+
+The dispatcher **self-polices framework adherence on cadence — don't wait to be told.** At each natural break, and whenever it's been ~1 working hour since the last harvest (the `/observe` hook fires — treat it as a do-it obligation, not advisory), run `/observe` (read-only, cheap) and **check your recent work against the live `questionnaire.md` compliance questions** before continuing; `/reflect` on real signal. The harvest's **process-audit** is part of this: did the rituals run on cadence? did work go through the loop (not inline)? was the real-usage/human-simulated test actually done? A code-only "looks healthy" is blind to the dispatcher's own drift — the watchdog exists because that drift (ignored cadence, inline-coding, skipped real-life tests) is exactly what piles up unseen and forces the human to be the watchdog instead. Detail + the deterministic hook backstop: `dispatch.md` ("Honor the harvest cadence"). This is human-paced (no autonomous cron is wired — see Autonomy); the *obligation to self-check* is standing.
+
 ## Tiers & effort
 
 Three dials the dispatcher sets per task (detail in `.claude/memory/dispatch.md`):

@@ -24,9 +24,12 @@ dispatcher writes this file. Scale to the task — a one-sentence diff skips thi
 
 - **Feature** — the request, verbatim.
 - **Built** — files changed, observable behavior, how to exercise with real data.
-- **Did you run a live test? (Directive 3)** — how you exercised it *the way it's actually
-  used*, and the gap to reality. UI/CLI → assert on the **rendered frame at a real terminal**
-  + the **human live smoke**; long-running → **past the limits / over time**.
+- **Did you run a live test? (Directive 3) — MANDATORY human-simulated env, not a state-check.**
+  Show you drove the **real binary in a PTY**, fed it real input (add an inject seam if it's
+  device-driven), and **asserted on the RENDERED SCREEN via an external emulator** (`pyte` /
+  `tmux capture-pane` / `script`) — paste the captured frame. An object/widget-state check
+  (`run_test().active`, `.lines`) does NOT count. Plus the **human live smoke** before "done."
+  Long-running → exercise **past the limits / over time**.
 - **Why does this work?** — the mechanism + reproducible evidence (command → output).
 - **Which edge cases did you cover? Which did you *not*?**
 - **Did you intentionally skip any code path / case — and why?**
