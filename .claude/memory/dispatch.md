@@ -62,3 +62,24 @@ Never gate on a token estimate: it's ~30x noisy on the same task and systematica
 - mechanical sweep across many files → `claude -p` fan-out, scoped `--allowedTools`, capped; test the prompt on 2–3 files first.
 - novel / off-distribution / architectural / security-critical → opus; human-led, low autonomy; agent assists, human decides.
 - hard / breadth-first / repeated-struggle → main session escalates to **xhigh + a workflow** (ultracode), then the reward gate + human verdict still apply.
+
+## Everything through the loop — keep the ensemble decorrelated
+
+All non-trivial tasks go through the dispatched loop (worker → tester **∥** reviewer → observer), not inline dispatcher hand-coding; even small bugfixes get worker+tester. Keep **tester and reviewer DECORRELATED — never collapse to one** for TUI/terminal, failure-mode/concurrency, and long-running/stateful work: the blind code-reading reviewer reliably catches reproduced blockers the black-box happy-path tester *passes* (those bugs only surface under a fault / race / render / past-a-limit). Inline-coding skips the reviewer — exactly when blockers ship. Truly trivial one-line/mechanical edits may be inline, but **log them**.
+
+## Real-life test for TUI/CLI (and human-perceived surfaces)
+
+A TUI's real behaviour is **frame-level**; widget/object-state assertions are blind to rendering, cropping, wrap, scroll, and over-time state. Satisfy the reward's "human-reproducible" bar for terminal/UI/audio work by (1) driving the **real binary at a real terminal (PTY, realistic size)** and asserting on the **rendered output**, and (2) a **mandatory human live smoke** before "done." State-green / pilot-green is necessary, never sufficient. (Enforced as the worker/reviewer "Real-usage test" done-questionnaire item.)
+
+## Escalate on oscillation — change the primitive, not the parameter
+
+When a fix is hand-tuning a heuristic **parameter** (threshold/window/timeout/retry/sensitivity) and **≥2 rounds fail with the same failure mode**, STOP: treat non-convergence as a **wrong-primitive** signal, run the Directive-1.7 prior-art scan for a robust replacement, and escalate to `/feature` — don't keep patching the constant. The 2nd identical failure is the signal to switch the primitive, not tune it.
+
+## Honor the harvest cadence — don't wait to be told
+
+The periodic `/observe` nudge is a **do-it obligation, not advisory.** Run `/observe` at each natural break (a feature accepted/committed, a stopping point) where the cadence is due — **proactively**, don't wait for the human to invoke it — and `/reflect` on real signal. The harvest exists to catch inline-drift, testing-gaps, and recurring same-component rounds **early**. When a harvest reports "healthy," also audit **process adherence** (did the rituals run on cadence? is the done-questionnaire used + complete?) — a code-only harvest is blind to the dispatcher's own drift. The human paces *world-actions*, not the read-only harvest; the harvest is the dispatcher's standing job. Also **log task outcomes** (task-type / rounds / verdict, incl. struggles & out-of-loop work) — the tier table can only learn from a populated `decisions.jsonl`.
+
+## Stale-build & multi-agent ops hygiene
+
+- A long-running **daemon/TUI/server** reported as "hanging / odd" → **first suspect a STALE in-memory build** (the process doesn't reload edited files); verify the running PID started after the latest edit + check its log before debugging code.
+- After a worker hands back, **verify the git branch before the dispatcher commits**; prefer `git checkout <sha> -- <files>` over a blind cherry-pick when a commit's parent already holds most of the change.
